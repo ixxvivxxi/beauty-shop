@@ -1,0 +1,39 @@
+services:
+  db:
+    image: mysql
+    container_name: beauty-shop-db
+    restart: unless-stopped
+    ports:
+      - ${DB_PORT}:${DB_PORT}
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+      TZ: Europe/Minsk
+    volumes:
+      - ./docker/mysql/my.cnf:/etc/mysql/my.cnf
+      - ./db-data:/var/lib/mysql
+    networks:
+      - app-network
+
+  phpmyadmin:
+    image: phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      PMA_USER: ${DB_USERNAME}
+      PMA_PASSWORD: ${DB_PASSWORD}
+      PMA_PORT: ${DB_PORT}
+      UPLOAD_LIMIT: 500M
+    ports:
+      - 9000:80
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
